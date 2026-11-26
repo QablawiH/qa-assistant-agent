@@ -1,5 +1,6 @@
 from google.adk.agents import Agent
 from .tools import get_security_and_edge_cases
+from .tools import get_security_and_edge_cases, generate_boundary_test_data
 
 QA_INSTRUCTION = """
 You are a Senior QA Automation Engineer. When a user provides a software feature description, follow these steps:
@@ -16,5 +17,5 @@ root_agent = Agent(
     model="gemini-3.5-flash",
     description="AI QA Assistant that generates structured test plans, security checks, and edge cases.",
     instruction=QA_INSTRUCTION,
-    tools=[get_security_and_edge_cases],
+    tools=[get_security_and_edge_cases, generate_boundary_test_data],
 )
